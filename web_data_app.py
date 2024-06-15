@@ -1,6 +1,6 @@
 # web_data_app.py
 # June 2024
-# Modified by: STUDENT NAME
+# Modified by: YAEL GONZALEZ
 #
 # An simple program for demonstrating web applications using Flask and web scraping of data using Beautiful Soup.
 # Detailed specifications are provided via the Assignment 5 README file.
@@ -72,16 +72,13 @@ def book_data():
     soup = BeautifulSoup(source.content, 'html.parser')     # Use BeautifulSoup to parse the website html code
     book_results = soup.find_all(attrs={'class':'product_pod'})  # By inspecting the site, we know books = product_pod class
 
-    titles = []
-    prices = []
-
-    # For each book listed on the page, get the title and the price from inside in the html data
-    for book in book_results:
-        titles.append(book.h3.a.get('title'))
-        prices.append(float(book.find('p', class_="price_color").text[1:]))
+    # For each book listed on the page, get the title and the price from inside in the html data   
+    titles = [book.h3.a.get('title') for book in book_results]
+    prices = [float(book.find('p', class_="price_color").text[1:]) for book in book_results]
+    sale_prices = [round(price * 0.75, 2) for price in prices]
 
     # Create a DataFrame using the two lists
-    book_data = pd.DataFrame(list(zip(titles, prices)), columns=['Titles','Prices'])    
+    book_data = pd.DataFrame(list(zip(titles, prices, sale_prices)), columns=['Titles','Prices', 'Sale Prices'])    
     print(book_data)        # Print to the terminal as confirmation - only we can see this
 
     # Format and print the DataFrame using the html template provided in the templates subdirectory
@@ -90,5 +87,6 @@ def book_data():
 @app.route("/learn")
 def learn():
     # Return a string the describes one thing you learned in ENSF 692.
-    pass
+    return "I learned to process data with numpy and pandas!"
 
+app.run(debug=True)
